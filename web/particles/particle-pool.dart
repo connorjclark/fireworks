@@ -10,7 +10,8 @@ class ParticlePool {
       numRings: mold.numRings, life: mold.life, growth: mold.growth,
       drag: mold.drag, xVel: mold.xVel, yVel: mold.yVel, fade: mold.fade,
       onStartDeath: mold._onStartDeath, duringDeath: mold._duringDeath,
-      flickerRate: mold.flickerRate);
+      flickerRate: mold.flickerRate, explosionMixin: mold.explosionMixin,
+      trailMixin: mold.trailMixin);
   
   Particle create(
   {
@@ -27,16 +28,19 @@ class ParticlePool {
     fade: 0,
     gravity: 0,
     flickerRate: 0,
+    explosionMixin: null,
+    trailMixin: null,
     void onStartDeath(Particle p): null,
     void duringDeath(Particle p, double dt): null
   })
   {
     onStartDeath = onStartDeath == null ? (Particle p) => p.fade = 3 : onStartDeath;
-    duringDeath = duringDeath == null ? (Particle p, double dt) => {} : duringDeath;
+    duringDeath = duringDeath == null ? (Particle p, double dt) {} : duringDeath;
     final p = pool.isNotEmpty ? pool.removeLast() : new Particle._private();
     p.init(x: x, y: y, size: size, color: color, numRings: numRings, life: life,
       growth: growth, drag: drag, xVel: xVel, yVel: yVel, flickerRate: flickerRate,
-      fade: fade, gravity: gravity, onStartDeath: onStartDeath, duringDeath: duringDeath);
+      fade: fade, gravity: gravity, onStartDeath: onStartDeath, duringDeath: duringDeath,
+      explosionMixin: explosionMixin, trailMixin: trailMixin);
     return p;
   }
   

@@ -41,7 +41,8 @@ class Particle extends Sprite {
   Particle._private();
   
   void init({num x, num y, num size, int color, int numRings, num life, 
-    num growth, num drag, num xVel, num yVel, num fade, num gravity, num flickerRate,
+    num growth, num drag, num xVel, num yVel, num fade, num gravity,
+    num flickerRate, ExplosionMixin explosionMixin, TrailMixin trailMixin,
     void onStartDeath(Particle p), void duringDeath(Particle p, double dt)}) {
     this
         ..visible = true
@@ -63,7 +64,9 @@ class Particle extends Sprite {
         ..yVel = yVel
         ..fade = fade
         ..gravity = gravity
-        ..flickerRate = _timeLeftUntilNextFlicker = flickerRate;
+        ..flickerRate = _timeLeftUntilNextFlicker = flickerRate
+        ..trailMixin = trailMixin
+        ..explosionMixin = explosionMixin;
     draw();
   }
   

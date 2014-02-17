@@ -5,11 +5,11 @@ abstract class TrailMixin {
 }
 
 class DefaultTrail implements TrailMixin {
-  final num frequency = 0.005;
+  final num frequency;
   num timeLeftUntilNext = 0;
   final int color;
   
-  DefaultTrail(this.color);
+  DefaultTrail({this.color, this.frequency});
   
   Particle createTrailParticle(ParticlePool pool, double dt, num x, num y) {
     if (timeLeftUntilNext <= 0) {
