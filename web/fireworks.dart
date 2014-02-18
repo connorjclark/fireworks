@@ -74,7 +74,7 @@ void createFirework(Point destination) {
   final particle = display.pool.create(
     x: origin.x, y: origin.y, size: range(2, 4), color: color, numRings: 4, life: travelTime, 
     growth: 1, drag: drag, xVel: velocity.x, yVel: velocity.y, fade: 0, gravity: gravity, 
-    onStartDeath: (Particle p) => p.fade = double.MAX_FINITE
+    onStartDeath: (Particle p) => p.alpha = 0
   );
   
   final chance = rand.nextDouble();
