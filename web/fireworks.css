@@ -17,6 +17,10 @@ h1, p {
   line-height: 1.25em;
 }
 
+a:link, a:visited {
+  color: lightblue;
+}
+
 #stage {
   width: 100%;
   height: 100%;
