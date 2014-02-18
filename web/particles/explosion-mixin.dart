@@ -36,7 +36,6 @@ class RingExplosion implements ExplosionMixin {
 }
 
 class ShapeExplosion implements ExplosionMixin {
-  
   final Particle mold;
   final int numParticles;
   final Shape shape;
@@ -61,6 +60,42 @@ class ShapeExplosion implements ExplosionMixin {
       
       final dir = shape.directions[currentIndex];
       final point = new Point(shape.vertices[currentIndex].x + dir.x * currentLength * interpolated, shape.vertices[currentIndex].y + dir.y * currentLength * interpolated);
+      final distance = point.length;
+      
+      final speed = distance * log(mold.drag) / (mold.drag - 1);
+      
+      final theta = atan2(point.y, point.x) + thetaOffset;
+      final particle = pool.createFrom(mold);
+      
+      particle
+          ..x = x 
+          ..y = y
+          ..xVel = speed * cos(theta)
+          ..yVel = speed * sin(theta);
+      return particle;
+    });
+  }
+}
+
+class ParametricExplosion implements ExplosionMixin {
+  final xt, yt;
+  final Particle mold;
+  final int numParticles;
+  
+  ParametricExplosion({num this.xt(num t), num this.yt(num t), this.mold, this.numParticles});
+  
+  ParametricExplosion.ellipse({num xRadius, num yRadius, this.mold, this.numParticles}) :
+    xt = ((t) => xRadius * cos(t * PI2)),
+    yt = ((t) => yRadius * sin(t* PI2));
+  
+  List<Particle> explode(ParticlePool pool, num x, num y) {
+    var runningLength = 0;
+    var currentIndex = 0;
+    final thetaOffset = range(0, PI2);
+    
+    return new List.generate(numParticles, (i) {
+      final t = i / numParticles;
+      final point = new Point(xt(t), yt(t));
       final distance = point.length;
       
       final speed = distance * log(mold.drag) / (mold.drag - 1);

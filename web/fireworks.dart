@@ -78,19 +78,32 @@ void createFirework(Point destination) {
   );
   
   final chance = rand.nextDouble();
-  if (chance < .1) {
+  if (chance < .05) {
     final squareVertices = [new Point(-explosionSize/2, explosionSize/2), new Point(-explosionSize/2, -explosionSize/2),
                             new Point(explosionSize/2, -explosionSize/2), new Point(explosionSize/2, explosionSize/2)];
     final squareExplosion = new ShapeExplosion(shape: new Shape(squareVertices), numParticles: numParticles, mold: mold);
     particle.explosionMixin = squareExplosion;
-  } else if (chance < .5) {
+  } else if (chance < .3) {
     particle.explosionMixin = new RingExplosion(mold: mold, radius: explosionSize, numParticles: numParticles);
-  } else {
+  } else if (chance < .7) {
     final p = range(5, 10).toInt();
     final q = range(2, 3).toInt();
     particle.explosionMixin = new ShapeExplosion(shape: new Shape.star(p, q, explosionSize), numParticles: (numParticles * 1.5).toInt(), mold: mold);
+  } else if (chance < .9) {
+    final ratio = range(0.1, 0.7);
+    if (rand.nextBool())
+      particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize * ratio, yRadius: explosionSize, numParticles: (numParticles * 1.5).toInt(), mold: mold);
+    else
+      particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize, yRadius: explosionSize * ratio, numParticles: (numParticles * 1.5).toInt(), mold: mold);
+  } else {
+    final heartSize = explosionSize * .75;
+    particle.explosionMixin = new ParametricExplosion(
+      xt: (t) => heartSize * pow(sin(t * PI * 2), 3),
+      yt: (t) => heartSize/16 * (13 * cos(t * PI * 2) - 5 * cos(4 * t * PI) - 2 * cos(6 * t * PI) - cos(8 * t * PI)),
+      numParticles: (numParticles * 1.5).toInt(), mold: mold
+    );
   }
-    
+  
   particle.trailMixin = new DefaultTrail(color: color, frequency: 0.005);
   
   display.add(particle);
