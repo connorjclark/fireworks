@@ -41,7 +41,7 @@ void start() {
   });
     
   html.querySelector("body").onClick.listen((event) {
-    createFirework(new Point(event.clientX, event.clientY));
+    createFirework(new Point(event.client.x, event.client.y));
   });
   
   html.querySelector("body").onKeyUp.listen((event) {
