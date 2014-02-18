@@ -39,28 +39,9 @@ class ShapeExplosion implements ExplosionMixin {
   
   final Particle mold;
   final int numParticles;
-  final List<Point> shape;
-  List<num> lengths;
-  List<Point> directions;
-  num perimeter;
+  final Shape shape;
   
-  ShapeExplosion({this.mold, this.numParticles, this.shape}) {
-    lengths = new List();
-    directions = new List();
-    perimeter = 0;
-    
-    for (var i = 0; i < shape.length; i++) {
-      final current = shape[i];
-      final next = shape[(i + 1) % shape.length];
-      final len = current.distanceTo(next);
-      final dir = new Point(next.x - current.x, next.y - current.y);
-      dir.normalize(1);
-      
-      perimeter += len;
-      lengths.add(len);
-      directions.add(dir);
-    }
-  }
+  ShapeExplosion({this.mold, this.numParticles, this.shape});
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
     var runningLength = 0;
@@ -68,19 +49,18 @@ class ShapeExplosion implements ExplosionMixin {
     final thetaOffset = range(0, PI2);
     
     return new List.generate(numParticles, (i) {
-      
-      while ((lengths[currentIndex] + runningLength) / perimeter < i / numParticles ) {
-        runningLength += lengths[currentIndex];
+      while ((shape.lengths[currentIndex] + runningLength) / shape.perimeter < i / numParticles ) {
+        runningLength += shape.lengths[currentIndex];
         currentIndex++;
       }
             
-      final currentLength = lengths[currentIndex];
-      final currentPercentage = (runningLength) / perimeter;
-      final nextPercentage = (currentLength + runningLength) / perimeter;
+      final currentLength = shape.lengths[currentIndex];
+      final currentPercentage = (runningLength) / shape.perimeter;
+      final nextPercentage = (currentLength + runningLength) / shape.perimeter;
       final interpolated = (i / numParticles - currentPercentage) / (nextPercentage - currentPercentage);
       
-      final dir = directions[currentIndex];
-      final point = new Point(shape[currentIndex].x + dir.x * currentLength * interpolated, shape[currentIndex].y + dir.y * currentLength * interpolated);
+      final dir = shape.directions[currentIndex];
+      final point = new Point(shape.vertices[currentIndex].x + dir.x * currentLength * interpolated, shape.vertices[currentIndex].y + dir.y * currentLength * interpolated);
       final distance = point.length;
       
       final speed = distance * log(mold.drag) / (mold.drag - 1);
