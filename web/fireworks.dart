@@ -103,7 +103,7 @@ void createFirework(Point destination) {
     final heartSize = explosionSize * .75;
     particle.explosionMixin = new ParametricExplosion(
       xt: (t) => heartSize * pow(sin(t * PI * 2), 3),
-      yt: (t) => heartSize/16 * (13 * cos(t * PI * 2) - 5 * cos(4 * t * PI) - 2 * cos(6 * t * PI) - cos(8 * t * PI)),
+      yt: (t) => -heartSize/16 * (13 * cos(t * PI * 2) - 5 * cos(4 * t * PI) - 2 * cos(6 * t * PI) - cos(8 * t * PI)),
       numParticles: (numParticles * 1.5).toInt(), mold: mold, thetaOffset: explosionThetaOffset
     );
   }
