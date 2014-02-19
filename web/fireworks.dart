@@ -34,7 +34,7 @@ void start() {
     timeElapsed += event.passedTime;
     if (timeElapsed >= fireworkInterval && constantLaunching) {
       timeElapsed -= fireworkInterval;
-      final x = new Interval.normal(stage.stageWidth / 2, 200).next();
+      final x = new Interval.normal(mean: stage.stageWidth / 2, sd: 200).next();
       final y = range(stage.stageHeight / 3, stage.stageHeight / 3 * 2);
       createFirework(new Point(x, y));
     }
@@ -55,10 +55,10 @@ void createFirework(Point destination) {
   final speed = range(400, 700);
   
   final thetaOffsetI = new Interval.uniform(-PI/4, PI/4);
-  final numParticlesI = new Interval.normal(25, 8);
-  final explosionSize = new Interval.normal(150, 25).next();
+  final numParticlesI = new Interval.normal(mean: 25, sd: 8);
+  final explosionSize = new Interval.normal(mean: 150, sd: 25).next();
   
-  final origin = new Point(new Interval.normal(stage.stageWidth / 2, 100).next(), stage.stageHeight);
+  final origin = new Point(new Interval.normal(mean: stage.stageWidth / 2, sd: 100).next(), stage.stageHeight);
   final positionDelta = destination.subtract(origin);
   final theta = atan2(positionDelta.y, positionDelta.x);
   final distanceToTravel = positionDelta.length;
@@ -93,7 +93,7 @@ void createFirework(Point destination) {
     final q = range(2, 3).toInt();
     particle.explosionMixin = new ShapeExplosion(shape: new Shape.star(p, q, explosionSize), mold: mold,
       thetaOffsetI: thetaOffsetI, numParticlesI: new Interval(() => 1.5 * numParticlesI.next()));
-  } else if (chance < .9) {
+  } else if (chance < .85) {
     final ratio = range(0.1, 0.7);
     if (rand.nextBool())
       particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize * ratio, yRadius: explosionSize,
@@ -101,13 +101,15 @@ void createFirework(Point destination) {
     else
       particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize, yRadius: explosionSize * ratio,
         numParticlesI: new Interval(() => 1.5 * numParticlesI.next()), mold: mold, thetaOffsetI: thetaOffsetI);
-  } else {
+  } else if (chance < .95) {
     final heartSize = explosionSize * .75;
     particle.explosionMixin = new ParametricExplosion(
       xt: (t) => heartSize * pow(sin(t * PI * 2), 3),
       yt: (t) => -heartSize/16 * (13 * cos(t * PI * 2) - 5 * cos(4 * t * PI) - 2 * cos(6 * t * PI) - cos(8 * t * PI)),
         numParticlesI: new Interval(() => 1.5 * numParticlesI.next()), mold: mold, thetaOffsetI: thetaOffsetI
     );
+  } else {
+    particle.explosionMixin = new BatmanExplosion(size: 300.0, mold: mold, thetaOffsetI: thetaOffsetI, numParticlesI: new Interval(() => 2 * numParticlesI.next()));
   }
   
   particle.trailMixin = new DefaultTrail(color: color, frequency: 0.005);

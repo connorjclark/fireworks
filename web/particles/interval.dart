@@ -10,13 +10,13 @@ class Interval {
   Interval.constant(num constant) : next = (() => constant);
   
   //see http://en.wikipedia.org/wiki/Marsaglia_polar_method
-  factory Interval.normal(num mean, num sd) {
+  factory Interval.normal({num mean: 0, num sd: 1, num min: -double.MAX_FINITE}) {
     num storedValue;
     bool hasStored = false;
     num normalDist() {
       if (hasStored) {
         hasStored = false;
-        return mean + sd * storedValue;
+        return max(mean + sd * storedValue, min);
       }
       
       while (true) {
@@ -27,7 +27,7 @@ class Interval {
           final squareRootTerm = sqrt(-2 * log(s) / s);
           storedValue = x * squareRootTerm;
           hasStored = true;
-          return mean + sd * y * squareRootTerm;
+          return max(mean + sd * y * squareRootTerm, min);
         }
       }
     }
