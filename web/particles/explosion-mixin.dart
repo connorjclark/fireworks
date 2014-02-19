@@ -2,10 +2,10 @@ part of particles;
 
 abstract class ExplosionMixin {
   final Particle mold;
-  final int numParticles;
-  final Interval thetaOffset;
+  final Interval numParticlesI;
+  final Interval thetaOffsetI;
   
-  ExplosionMixin({this.mold, this.numParticles, this.thetaOffset});
+  ExplosionMixin({this.mold, this.numParticlesI, this.thetaOffsetI});
 
   List<Particle> explode(ParticlePool pool, num x, num y);
 
@@ -23,14 +23,16 @@ abstract class ExplosionMixin {
 class RingExplosion extends ExplosionMixin {
   final num radius;
   
-  RingExplosion({this.radius, Particle mold, int numParticles, Interval thetaOffset}) :
-    super(mold: mold, numParticles: numParticles, thetaOffset: thetaOffset);
+  RingExplosion({this.radius, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
+    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
     final speed = _calculateSpeed(radius);
-    final offset = thetaOffset.next();
+    final thetaOffset = thetaOffsetI.next();
+    final numParticles = numParticlesI.next().toInt();
+    
     return new List.generate(numParticles, (i) {
-      final theta = PI2 * i / numParticles + offset;
+      final theta = PI2 * i / numParticles + thetaOffset;
       
       final particle = pool.createFrom(mold);
       particle
@@ -46,13 +48,14 @@ class RingExplosion extends ExplosionMixin {
 class ShapeExplosion extends ExplosionMixin {
   final Shape shape;
   
-  ShapeExplosion({this.shape, Particle mold, int numParticles, Interval thetaOffset}) :
-    super(mold: mold, numParticles: numParticles, thetaOffset: thetaOffset);
+  ShapeExplosion({this.shape, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
+    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
     var runningLength = 0;
     var currentIndex = 0;
-    final offset = thetaOffset.next();
+    final thetaOffset = thetaOffsetI.next();
+    final numParticles = numParticlesI.next().toInt();
     
     return new List.generate(numParticles, (i) {
       while ((shape.lengths[currentIndex] + runningLength) / shape.perimeter < i / numParticles ) {
@@ -68,7 +71,7 @@ class ShapeExplosion extends ExplosionMixin {
       final dir = shape.directions[currentIndex];
       final point = new Point(shape.vertices[currentIndex].x + dir.x * currentLength * interpolated, shape.vertices[currentIndex].y + dir.y * currentLength * interpolated);
       final distance = point.length;
-      final theta = atan2(point.y, point.x) + offset;
+      final theta = atan2(point.y, point.x) + thetaOffset;
       final speed = _calculateSpeed(distance);
       
       final particle = pool.createFrom(mold);
@@ -85,24 +88,25 @@ class ShapeExplosion extends ExplosionMixin {
 class ParametricExplosion extends ExplosionMixin {
   final xt, yt;
   
-  ParametricExplosion({num this.xt(num t), num this.yt(num t), Particle mold, int numParticles, Interval thetaOffset}) :
-    super(mold: mold, numParticles: numParticles, thetaOffset: thetaOffset);
+  ParametricExplosion({num this.xt(num t), num this.yt(num t), Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
+    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
   
-  ParametricExplosion.ellipse({num xRadius, num yRadius, Particle mold, int numParticles, Interval thetaOffset}) :
-    super(mold: mold, numParticles: numParticles, thetaOffset: thetaOffset),
+  ParametricExplosion.ellipse({num xRadius, num yRadius, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
+    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI),
     xt = ((t) => xRadius * cos(t * PI2)),
     yt = ((t) => yRadius * sin(t* PI2));
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
     var runningLength = 0;
     var currentIndex = 0;
-    final offset = thetaOffset.next();
+    final thetaOffset = thetaOffsetI.next();
+    final numParticles = numParticlesI.next().toInt();
     
     return new List.generate(numParticles, (i) {
       final t = i / numParticles;
       final point = new Point(xt(t), yt(t));
       final distance = point.length;
-      final theta = atan2(point.y, point.x) + offset;
+      final theta = atan2(point.y, point.x) + thetaOffset;
       final speed = _calculateSpeed(distance);
       
       final particle = pool.createFrom(mold);

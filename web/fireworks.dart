@@ -54,7 +54,9 @@ void createFirework(Point destination) {
   final gravity = 10;
   final speed = range(400, 700);
   
-  final explosionThetaOffset = new Interval.uniform(-PI/4, PI/4);
+  final thetaOffsetI = new Interval.uniform(-PI/4, PI/4);
+  final numParticlesI = new Interval.normal(25, 8);
+  final explosionSize = new Interval.normal(150, 25).next();
   
   final origin = new Point(new Interval.normal(stage.stageWidth / 2, 100).next(), stage.stageHeight);
   final positionDelta = destination.subtract(origin);
@@ -65,8 +67,7 @@ void createFirework(Point destination) {
   final velocity = new Point(speed * cos(theta), speed * sin(theta));
     
   final color = randomLightColor();
-  final numParticles = new Interval.normal(25, 8).next().toInt();
-  final explosionSize = new Interval.normal(150, 25).next();
+  
   final mold = display.pool.create(
     x: 600, y: 800, size: range(2, 3), color: color, numRings: 4, life: 1,
     growth: 0.6, drag: 0.1, xVel: 0, yVel: 0, fade: 0.95, gravity: 300.0, 
@@ -83,29 +84,29 @@ void createFirework(Point destination) {
   if (chance < .05) {
     final squareVertices = [new Point(-explosionSize/2, explosionSize/2), new Point(-explosionSize/2, -explosionSize/2),
                             new Point(explosionSize/2, -explosionSize/2), new Point(explosionSize/2, explosionSize/2)];
-    final squareExplosion = new ShapeExplosion(shape: new Shape(squareVertices), numParticles: numParticles, mold: mold, thetaOffset: explosionThetaOffset);
+    final squareExplosion = new ShapeExplosion(shape: new Shape(squareVertices), numParticlesI: numParticlesI, mold: mold, thetaOffsetI: thetaOffsetI);
     particle.explosionMixin = squareExplosion;
   } else if (chance < .3) {
-    particle.explosionMixin = new RingExplosion(mold: mold, radius: explosionSize, numParticles: numParticles, thetaOffset: explosionThetaOffset);
+    particle.explosionMixin = new RingExplosion(mold: mold, radius: explosionSize, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
   } else if (chance < .7) {
     final p = range(5, 10).toInt();
     final q = range(2, 3).toInt();
-    particle.explosionMixin = new ShapeExplosion(shape: new Shape.star(p, q, explosionSize), numParticles: (numParticles * 1.5).toInt(),
-      mold: mold, thetaOffset: explosionThetaOffset);
+    particle.explosionMixin = new ShapeExplosion(shape: new Shape.star(p, q, explosionSize), mold: mold,
+      thetaOffsetI: thetaOffsetI, numParticlesI: new Interval(() => 1.5 * numParticlesI.next()));
   } else if (chance < .9) {
     final ratio = range(0.1, 0.7);
     if (rand.nextBool())
       particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize * ratio, yRadius: explosionSize,
-        numParticles: (numParticles * 1.5).toInt(), mold: mold, thetaOffset: explosionThetaOffset);
+        numParticlesI: new Interval(() => 1.5 * numParticlesI.next()), mold: mold, thetaOffsetI: thetaOffsetI);
     else
       particle.explosionMixin = new ParametricExplosion.ellipse(xRadius: explosionSize, yRadius: explosionSize * ratio,
-        numParticles: (numParticles * 1.5).toInt(), mold: mold, thetaOffset: explosionThetaOffset);
+        numParticlesI: new Interval(() => 1.5 * numParticlesI.next()), mold: mold, thetaOffsetI: thetaOffsetI);
   } else {
     final heartSize = explosionSize * .75;
     particle.explosionMixin = new ParametricExplosion(
       xt: (t) => heartSize * pow(sin(t * PI * 2), 3),
       yt: (t) => -heartSize/16 * (13 * cos(t * PI * 2) - 5 * cos(4 * t * PI) - 2 * cos(6 * t * PI) - cos(8 * t * PI)),
-      numParticles: (numParticles * 1.5).toInt(), mold: mold, thetaOffset: explosionThetaOffset
+        numParticlesI: new Interval(() => 1.5 * numParticlesI.next()), mold: mold, thetaOffsetI: thetaOffsetI
     );
   }
   
