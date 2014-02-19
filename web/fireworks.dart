@@ -34,7 +34,7 @@ void start() {
     timeElapsed += event.passedTime;
     if (timeElapsed >= fireworkInterval && constantLaunching) {
       timeElapsed -= fireworkInterval;
-      final x = range(stage.stageWidth / 5, stage.stageWidth / 5 * 4);
+      final x = new Interval.normal(stage.stageWidth / 2, 200).next();
       final y = range(stage.stageHeight / 3, stage.stageHeight / 3 * 2);
       createFirework(new Point(x, y));
     }
@@ -53,9 +53,10 @@ void createFirework(Point destination) {
   final drag = 1;
   final gravity = 10;
   final speed = range(400, 700);
-  final explosionThetaOffset = new Interval.uniform(0, 0);
   
-  final origin = new Point(range(stage.stageWidth / 3, stage.stageWidth / 3 * 2), stage.stageHeight);
+  final explosionThetaOffset = new Interval.uniform(-PI/4, PI/4);
+  
+  final origin = new Point(new Interval.normal(stage.stageWidth / 2, 100).next(), stage.stageHeight);
   final positionDelta = destination.subtract(origin);
   final theta = atan2(positionDelta.y, positionDelta.x);
   final distanceToTravel = positionDelta.length;
@@ -64,8 +65,8 @@ void createFirework(Point destination) {
   final velocity = new Point(speed * cos(theta), speed * sin(theta));
     
   final color = randomLightColor();
-  final numParticles = range(10, 30).toInt();
-  final explosionSize = range(100, 200);
+  final numParticles = new Interval.normal(25, 8).next().toInt();
+  final explosionSize = new Interval.normal(150, 25).next();
   final mold = display.pool.create(
     x: 600, y: 800, size: range(2, 3), color: color, numRings: 4, life: 1,
     growth: 0.6, drag: 0.1, xVel: 0, yVel: 0, fade: 0.95, gravity: 300.0, 
