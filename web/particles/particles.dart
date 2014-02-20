@@ -12,6 +12,7 @@ part 'trail-mixin.dart';
 part 'shape.dart';
 part 'interval.dart';
 part 'batman-explosion.dart';
+part 'particle-emitter.dart';
 
 final Random rand = new Random();
 const num PI2 = PI * 2;

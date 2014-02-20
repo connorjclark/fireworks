@@ -1,11 +1,17 @@
 part of particles;
 
 abstract class ExplosionMixin {
-  final Particle mold;
+  final ParticleEmitter emitter;
   final Interval numParticlesI;
   final Interval thetaOffsetI;
+  final Interval sizeI;
   
-  ExplosionMixin({this.mold, this.numParticlesI, this.thetaOffsetI});
+  ExplosionMixin({this.emitter, this.numParticlesI, this.thetaOffsetI, this.sizeI}) {
+    if (emitter == null) throw new ArgumentError("emitter must be given");
+    if (numParticlesI == null) throw new ArgumentError("numParticlesI must be given");
+    if (thetaOffsetI == null) throw new ArgumentError("thetaOffsetI must be given");
+    if (sizeI == null) throw new ArgumentError("sizeI must be given");
+  }
 
   List<Particle> explode(ParticlePool pool, num x, num y);
 
@@ -17,17 +23,18 @@ abstract class ExplosionMixin {
    * (2) given the particle lives long enough, it will stop moving at
    *     a distance of 'dist' from the center
    */
-  num _calculateSpeed(num dist) => dist * log(mold.drag) / (mold.drag - 1);
+  //TODO: account for explosion durations other than 1
+  num _calculateSpeed(num dist, num drag) => dist * log(drag) / (drag - 1);
 }
 
 class RingExplosion extends ExplosionMixin {
-  final num radius;
-  
-  RingExplosion({this.radius, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
-    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
+  RingExplosion({ParticleEmitter emitter, Interval numParticlesI, Interval thetaOffsetI, Interval sizeI}) :
+    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI);
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
-    final speed = _calculateSpeed(radius);
+    final mold = emitter.create(pool, x, y);
+    final radius = sizeI.next();
+    final speed = _calculateSpeed(radius, mold.drag);
     final thetaOffset = thetaOffsetI.next();
     final numParticles = numParticlesI.next().toInt();
     
@@ -36,8 +43,6 @@ class RingExplosion extends ExplosionMixin {
       
       final particle = pool.createFrom(mold);
       particle
-          ..x = x 
-          ..y = y
           ..xVel = speed * cos(theta)
           ..yVel = speed * sin(theta);
       return particle;
@@ -48,10 +53,12 @@ class RingExplosion extends ExplosionMixin {
 class ShapeExplosion extends ExplosionMixin {
   final Shape shape;
   
-  ShapeExplosion({this.shape, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
-    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
+  ShapeExplosion({this.shape, ParticleEmitter emitter, Interval numParticlesI, Interval thetaOffsetI, Interval sizeI}) :
+    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI);
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
+    final mold = emitter.create(pool, x, y);
+    final size = sizeI.next();
     var runningLength = 0;
     var currentIndex = 0;
     final thetaOffset = thetaOffsetI.next();
@@ -70,14 +77,14 @@ class ShapeExplosion extends ExplosionMixin {
       
       final dir = shape.directions[currentIndex];
       final point = new Point(shape.vertices[currentIndex].x + dir.x * currentLength * interpolated, shape.vertices[currentIndex].y + dir.y * currentLength * interpolated);
+      point.x *= size;
+      point.y *= size;
       final distance = point.length;
       final theta = atan2(point.y, point.x) + thetaOffset;
-      final speed = _calculateSpeed(distance);
+      final speed = _calculateSpeed(distance, mold.drag);
       
       final particle = pool.createFrom(mold);
       particle
-          ..x = x 
-          ..y = y
           ..xVel = speed * cos(theta)
           ..yVel = speed * sin(theta);
       return particle;
@@ -88,15 +95,18 @@ class ShapeExplosion extends ExplosionMixin {
 class ParametricExplosion extends ExplosionMixin {
   final xt, yt;
   
-  ParametricExplosion({num this.xt(num t), num this.yt(num t), Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
-    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI);
+  ParametricExplosion({num this.xt(num t), num this.yt(num t), ParticleEmitter emitter, Interval numParticlesI, Interval thetaOffsetI, Interval sizeI}) :
+    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI);
   
-  ParametricExplosion.ellipse({num xRadius, num yRadius, Particle mold, Interval numParticlesI, Interval thetaOffsetI}) :
-    super(mold: mold, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI),
-    xt = ((t) => xRadius * cos(t * PI2)),
-    yt = ((t) => yRadius * sin(t* PI2));
+  //TODO: fix sizing
+  ParametricExplosion.ellipse({num xyRatio, ParticleEmitter emitter, Interval numParticlesI, Interval thetaOffsetI, Interval sizeI}) :
+    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI),
+    xt = ((t) => xyRatio * cos(t * PI2)),
+    yt = ((t) => (1 - xyRatio) * sin(t* PI2));
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
+    final mold = emitter.create(pool, x, y);
+    final size = sizeI.next();
     var runningLength = 0;
     var currentIndex = 0;
     final thetaOffset = thetaOffsetI.next();
@@ -104,15 +114,13 @@ class ParametricExplosion extends ExplosionMixin {
     
     return new List.generate(numParticles, (i) {
       final t = i / numParticles;
-      final point = new Point(xt(t), yt(t));
+      final point = new Point(size * xt(t), size * yt(t));
       final distance = point.length;
       final theta = atan2(point.y, point.x) + thetaOffset;
-      final speed = _calculateSpeed(distance);
+      final speed = _calculateSpeed(distance, mold.drag);
       
       final particle = pool.createFrom(mold);
       particle
-          ..x = x 
-          ..y = y
           ..xVel = speed * cos(theta)
           ..yVel = speed * sin(theta);
       return particle;
