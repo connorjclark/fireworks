@@ -31,6 +31,7 @@ void start() {
   final xI = new Interval.normal(mean: stage.stageWidth / 2, sd: 200);
   var constantLaunching = true;
   var timeElapsed = 0.0;
+  num fpsAverage = null;
   
   stage.onEnterFrame.listen((event) {
     if (timeElapsed > 5) timeElapsed = 0;
@@ -41,6 +42,14 @@ void start() {
       final y = range(stage.stageHeight / 3, stage.stageHeight / 3 * 2);
       createFireworks(new Point(x, y));
     }
+    
+    if (fpsAverage == null) {
+      fpsAverage = 1.00 / event.passedTime;
+    } else {
+      fpsAverage = 0.05 / event.passedTime + 0.95 * fpsAverage;
+    }    
+    
+    html.querySelector("#fps").text = "FPS: ${fpsAverage.round()} Particles:${display.numChildren}";
   });
     
   html.querySelector("body").onClick.listen((event) {
