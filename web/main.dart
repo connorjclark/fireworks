@@ -59,6 +59,10 @@ void start() {
   
   html.querySelector("body").onKeyUp.listen((event) {
     if (event.keyCode == html.KeyCode.SPACE) constantLaunching = !constantLaunching;
+    if (event.keyCode == html.KeyCode.H) {
+      var el = html.querySelector('#text-div');
+      el.hidden = !el.hidden;
+    }
   });
 }
 
