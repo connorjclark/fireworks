@@ -5,6 +5,7 @@ body {
   font-weight: normal;
   line-height: 1.2em;
   overflow: hidden;
+  margin: 0;
 }
 
 #text-div {

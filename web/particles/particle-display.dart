@@ -2,7 +2,7 @@ part of particles;
 
 class ParticleDisplay extends Sprite {
   final ParticlePool pool = new ParticlePool(100);
-  final List<Particle> activeParticles = new List();
+  final List<Particle> activeParticles = [];
   
   ParticleDisplay() {
     onEnterFrame.listen((event) => _update(event.passedTime));
@@ -12,7 +12,7 @@ class ParticleDisplay extends Sprite {
   num timeElapsed = 0;
   void _update(num dt) {
     timeElapsed += dt;
-    final newParticles = new List();
+    final newParticles = <Particle>[];
     activeParticles.removeWhere((particle) {
       particle.update(dt);
       

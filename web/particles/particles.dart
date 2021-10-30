@@ -15,5 +15,5 @@ part 'batman-explosion.dart';
 part 'particle-emitter.dart';
 
 final Random rand = new Random();
-const num PI2 = PI * 2;
+const num PI2 = pi * 2;
 num range(num min, num max) => rand.nextDouble() * (max - min) + min;

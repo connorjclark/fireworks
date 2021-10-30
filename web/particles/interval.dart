@@ -1,7 +1,9 @@
 part of particles;
 
+typedef FuncReturnNumber = num Function();
+
 class Interval {  
-  final next;
+  final FuncReturnNumber next;
   
   Interval(num this.next());
   
@@ -10,7 +12,7 @@ class Interval {
   Interval.constant(num constant) : next = (() => constant);
   
   //see http://en.wikipedia.org/wiki/Marsaglia_polar_method
-  factory Interval.normal({num mean: 0, num sd: 1, num min: -double.MAX_FINITE}) {
+  factory Interval.normal({num mean: 0, num sd: 1, num min: -double.maxFinite}) {
     num storedValue;
     bool hasStored = false;
     num normalDist() {

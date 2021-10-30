@@ -59,8 +59,8 @@ class ShapeExplosion extends ExplosionMixin {
   List<Particle> explode(ParticlePool pool, num x, num y) {
     final mold = emitter.create(pool, x, y);
     final size = sizeI.next();
-    var runningLength = 0;
-    var currentIndex = 0;
+    num runningLength = 0;
+    int currentIndex = 0;
     final thetaOffset = thetaOffsetI.next();
     final numParticles = numParticlesI.next().toInt();
     
@@ -79,7 +79,7 @@ class ShapeExplosion extends ExplosionMixin {
       final point = new Point(shape.vertices[currentIndex].x + dir.x * currentLength * interpolated, shape.vertices[currentIndex].y + dir.y * currentLength * interpolated);
       point.x *= size;
       point.y *= size;
-      final distance = point.length;
+      final distance = point.magnitude;
       final theta = atan2(point.y, point.x) + thetaOffset;
       final speed = _calculateSpeed(distance, mold.drag);
       
@@ -100,9 +100,9 @@ class ParametricExplosion extends ExplosionMixin {
   
   //TODO: fix sizing
   ParametricExplosion.ellipse({num xyRatio, ParticleEmitter emitter, Interval numParticlesI, Interval thetaOffsetI, Interval sizeI}) :
-    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI),
     xt = ((t) => xyRatio * cos(t * PI2)),
-    yt = ((t) => (1 - xyRatio) * sin(t* PI2));
+    yt = ((t) => (1 - xyRatio) * sin(t* PI2)),
+    super(emitter: emitter, numParticlesI: numParticlesI, thetaOffsetI: thetaOffsetI, sizeI: sizeI);
   
   List<Particle> explode(ParticlePool pool, num x, num y) {
     final mold = emitter.create(pool, x, y);
@@ -115,7 +115,7 @@ class ParametricExplosion extends ExplosionMixin {
     return new List.generate(numParticles, (i) {
       final t = i / numParticles;
       final point = new Point(size * xt(t), size * yt(t));
-      final distance = point.length;
+      final distance = point.magnitude;
       final theta = atan2(point.y, point.x) + thetaOffset;
       final speed = _calculateSpeed(distance, mold.drag);
       

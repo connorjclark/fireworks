@@ -29,14 +29,17 @@ class Shape {
   
   factory Shape(List<Point> vertices) {
     var perimeter = 0.0;
-    final lengths = [];
-    final directions = [];
+    final lengths = <num>[];
+    final directions = <Point>[];
     for (var i = 0; i < vertices.length; i++) {
       final current = vertices[i];
       final next = vertices[(i + 1) % vertices.length];
       final len = current.distanceTo(next);
-      final dir = new Point(next.x - current.x, next.y - current.y);
-      dir.normalize(1);
+      var dir = new Point(next.x - current.x, next.y - current.y);
+
+      // Normalize.
+      dir.x = dir.x / dir.magnitude;
+      dir.y = dir.y / dir.magnitude;
       
       perimeter += len;
       lengths.add(len);

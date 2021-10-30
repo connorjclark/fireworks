@@ -1,14 +1,15 @@
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart' hide Shape;
 import 'particles/particles.dart';
-import 'dart:math' hide Point;
+import 'dart:math';
 
-final stage = new Stage(html.querySelector("#stage"), color: Color.Transparent);
+final stage = new Stage(html.querySelector("#stage"));
 final display = new ParticleDisplay();
 
 void main() {
   stage.scaleMode = StageScaleMode.NO_SCALE;
   stage.align = StageAlign.TOP_LEFT;
+  stage.backgroundColor = Color.Transparent;
   
   var resourceManager = new ResourceManager()
       ..addBitmapData('moon', 'images/moon.png');
@@ -47,7 +48,7 @@ void start() {
       fpsAverage = 1.00 / event.passedTime;
     } else {
       fpsAverage = 0.05 / event.passedTime + 0.95 * fpsAverage;
-    }    
+    }
     
     html.querySelector("#fps").text = "FPS: ${fpsAverage.round()} Particles:${display.numChildren}";
   });
@@ -74,7 +75,7 @@ void initializeFireworksSelection() {
   final fadeI = new Interval.constant(0);
   final lifeI = new Interval.constant(1);
   final trailMixin = new DefaultTrail(colorI: colorI, frequency: 0.005);
-  final PI2 = PI * 2;
+  final PI2 = pi * 2;
   
   //common explosion components
   final explosionEmitter = new ParticleEmitter(
@@ -82,7 +83,7 @@ void initializeFireworksSelection() {
     gravityI: new Interval.constant(100), lifeI: lifeI, trailMixin: new DefaultTrail(colorI: colorI, frequency: 0.1),
     explosionMixin: null
   );
-  final thetaOffsetI = new Interval.uniform(-PI / 4, PI / 4);
+  final thetaOffsetI = new Interval.uniform(-pi / 4, pi / 4);
   final numParticlesI = new Interval.normal(mean: 25, sd: 8, min: 5);
   final numParticlesI_2 = new Interval.normal(mean: 45, sd: 8, min: 20);
   final explosionSizeI = new Interval.normal(mean: 150, sd: 25, min: 20);
@@ -220,9 +221,9 @@ void initializeFireworksSelection() {
 void createFireworks(Point destination) {
   final speed = range(400, 700);
   final origin = new Point(new Interval.normal(mean: stage.stageWidth / 2, sd: 100).next(), stage.stageHeight);
-  final positionDelta = destination.subtract(origin);
+  final positionDelta = destination - origin;
   final theta = atan2(positionDelta.y, positionDelta.x);
-  final distanceToTravel = positionDelta.length;
+  final distanceToTravel = positionDelta.magnitude;
   final travelTime = distanceToTravel / speed;
   final velocity = new Point(speed * cos(theta), speed * sin(theta));
   final Particle particle = fireworksSelection[rand.nextInt(fireworksSelection.length)].create(display.pool, origin.x, origin.y);
