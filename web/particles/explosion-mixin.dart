@@ -107,8 +107,6 @@ class ParametricExplosion extends ExplosionMixin {
   List<Particle> explode(ParticlePool pool, num x, num y) {
     final mold = emitter.create(pool, x, y);
     final size = sizeI.next();
-    var runningLength = 0;
-    var currentIndex = 0;
     final thetaOffset = thetaOffsetI.next();
     final numParticles = numParticlesI.next().toInt();
     
