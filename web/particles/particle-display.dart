@@ -44,6 +44,6 @@ class ParticleDisplay extends Sprite {
   
   void addAll(List<Particle> particles) {
    activeParticles.addAll(particles);
-   activeParticles.forEach((_) => _.addTo(this));
+   particles.forEach((_) => _.addTo(this));
   }
 }
