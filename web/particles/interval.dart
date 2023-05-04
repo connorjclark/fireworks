@@ -13,7 +13,7 @@ class Interval {
   
   //see http://en.wikipedia.org/wiki/Marsaglia_polar_method
   factory Interval.normal({num mean: 0, num sd: 1, num min: -double.maxFinite}) {
-    num storedValue;
+    num storedValue = 0;
     bool hasStored = false;
     num normalDist() {
       if (hasStored) {

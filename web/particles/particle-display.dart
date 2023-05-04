@@ -16,15 +16,17 @@ class ParticleDisplay extends Sprite {
     activeParticles.removeWhere((particle) {
       particle.update(dt);
       
-      if (particle.trailMixin != null) {
-        final trail = particle.trailMixin.createTrailParticle(pool, dt, particle.x, particle.y);
+      final trailMixin = particle.trailMixin;
+      if (trailMixin != null) {
+        final trail = trailMixin.createTrailParticle(pool, dt, particle.x, particle.y);
         if (trail != null) newParticles.add(trail);
       }
       
       final isDead = !particle.stillAlive();
       if (isDead) {
-        if (particle.explosionMixin != null) {
-          particle.explosionMixin.explode(pool, particle.x, particle.y).forEach((newParticle) {
+        final explosionMixin = particle.explosionMixin;
+        if (explosionMixin != null) {
+          explosionMixin.explode(pool, particle.x, particle.y).forEach((newParticle) {
             newParticles.add(newParticle);
           });
         }

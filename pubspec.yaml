@@ -1,6 +1,6 @@
 name: fireworks
 description: Fireworks!
 environment:
-  sdk: '>=2.10.0 <3.0.0'
+  sdk: '>=2.18.0 <3.0.0'
 dependencies:
-  stagexl: 2.0.0
+  stagexl: 2.1.2

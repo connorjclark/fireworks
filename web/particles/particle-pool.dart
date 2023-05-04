@@ -30,8 +30,8 @@ class ParticlePool {
     flickerRate: 0,
     explosionMixin: null,
     trailMixin: null,
-    void onStartDeath(Particle p): null,
-    void duringDeath(Particle p, double dt): null
+    void onStartDeath(Particle p)?: null,
+    void duringDeath(Particle p, double dt)?: null
   })
   {
     onStartDeath = onStartDeath == null ? (Particle p) => p.fade = 3 : onStartDeath;

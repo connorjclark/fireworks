@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:html' as html;
 import 'package:stagexl/stagexl.dart' hide Shape;
 import 'particles/particles.dart';
